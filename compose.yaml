@@ -1,0 +1,83 @@
+name: sample_app
+services:
+  frontend:
+    build: apps/frontend
+    ports:
+      - 8080:8080
+      - 6006:6006
+    volumes:
+      - ./apps/frontend:/app
+      - /app/node_modules
+    stdin_open: true
+    tty: true
+    command: /bin/sh -c "npm run dev"
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
+        max-file: "3"
+    healthcheck:
+      # node イメージに curl が入っていないため node の fetch で確認する
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://localhost:8080').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  db:
+    image: postgres:16
+    command: postgres -c log_destination=stderr -c log_statement=all
+    volumes:
+      - ./db:/db
+      - psgl_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: web
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - 5432:5432
+    working_dir: /db
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
+        max-file: "3"
+    healthcheck:
+      test: "psql -U postgres"
+      interval: 3s
+      timeout: 3s
+      retries: 100
+      start_period: 10s
+
+  api:
+    build:
+      context: ./apps/api
+      target: dev
+    command: /bin/sh -c "bacon fmt-run --headless"
+    tty: true
+    stdin_open: true
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - CARGO_TARGET_DIR=/tmp/target
+      - RUST_BACKTRACE=1
+    ports:
+      - 3000:3000
+    working_dir: /app
+    volumes:
+      - ./apps/api:/app
+      - api_target_cache:/tmp/target
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
+        max-file: "3"
+
+volumes:
+  psgl_data:
+  api_target_cache:

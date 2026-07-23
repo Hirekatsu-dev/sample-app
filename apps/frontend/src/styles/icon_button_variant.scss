@@ -1,0 +1,20 @@
+@mixin icon_button_variant(
+  $name,
+  $color,
+  $hover_color
+) {
+  .icon-button-variant-#{$name} {
+    color: $color;
+    border-color: $color;
+
+    &:hover {
+      background-color: $hover_color;
+    }
+
+    &:disabled {
+      background-color: var(--color-white);
+      border-color: var(--color-disabled);
+      color: var(--color-disabled);
+    }
+  }
+}

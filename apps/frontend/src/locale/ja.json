@@ -1,0 +1,28 @@
+{
+  "login": {
+    "label": "ログイン",
+    "field": {
+      "email": "メールアドレス",
+      "password": "パスワード"
+    }
+  },
+  "logout": "ログアウト",
+  "edit_profile": "プロフィール編集",
+  "change_password": "パスワード変更",
+  "validation": {
+    "required": "{name}を入力してください。",
+    "max_length": "{name}は{max}文字以内で入力してください。"
+  },
+  "problem": {
+    "field": {
+      "title": "タイトル",
+      "problem_content": "問題内容"
+    }
+  },
+  "expected_answer": {
+    "field": {
+      "title": "タイトル",
+      "answer_content": "想定解の内容"
+    }
+  }
+}

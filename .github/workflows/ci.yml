@@ -1,0 +1,61 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  test-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Start Frontend
+        run: |
+          docker compose up -d frontend
+          docker compose exec -T frontend npm install
+      - name: Lint
+        run: docker compose exec -T frontend npm run lint
+      - name: Type Check
+        run: docker compose exec -T frontend npm run type-check
+  test-api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Prepare Env
+        run: cp apps/api/example.env apps/api/.env
+      - name: Start API
+        run: docker compose up -d api db
+      - name: Check Format
+        run: docker compose exec -T api cargo fmt -- --check
+      - name: Check Clippy
+        run: docker compose exec -T api cargo clippy -- -D warnings
+      - name: Prepare DB
+        run: docker compose exec -T db sh -c "cd bin && bash ./prepare.sh"
+      - name: Test API
+        run: docker compose exec -T api cargo test -- --test-threads=1
+  test-generator:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: generator
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Setup Node
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: "22"
+      - name: Setup Generator
+        run: npm ci
+      - name: Lint/Format Generator
+        run: npm run lint
+      - name: Check Generated Files Are Up To Date
+        run: |
+          npm run generate
+          cd ..
+          git diff --exit-code
+  test-shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: ShellCheck
+        run: find cli db -name "*.sh" | xargs shellcheck

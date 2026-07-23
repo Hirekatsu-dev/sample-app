@@ -1,0 +1,61 @@
+#!/bin/bash
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+COMMAND_ROOT="$PROJECT_ROOT/cli/commands"
+export LIB_ROOT="$PROJECT_ROOT/cli/lib"
+export COMPOSE_FILE_PATH="$PROJECT_ROOT/compose.yaml"
+
+# 共通処理読み込み
+# shellcheck source=/dev/null
+source "$LIB_ROOT/color.sh"
+# shellcheck source=/dev/null
+source "$LIB_ROOT/log.sh"
+
+# コマンドに応じて処理を振り分け
+CMD="${1:-}"
+
+# 補完モードの処理
+if [[ "$CMD" == "--completion" ]]; then
+  # 第2引数以降をチェック（サブコマンドの補完）
+  SUBCMD="${2:-}"
+  if [[ "$SUBCMD" == "local" ]]; then
+    # local サブコマンドの補完を取得
+    source "$COMMAND_ROOT/local.sh" --completion "${@:3}"
+    exit 0
+  else
+    # メインコマンドの補完
+    echo "local help"
+    exit 0
+  fi
+fi
+
+shift || true
+
+print_usage() {
+  echo -e "${BOLD}USAGE:${RESET}"
+  echo -e "  sampleapp <command> [options]"
+  echo
+
+  echo -e "${BOLD}COMMANDS:${RESET}"
+  printf "  ${YELLOW}%-10s${RESET} %s\n" "local"  "ローカル環境での開発・実行用コマンド"
+  printf "  ${YELLOW}%-10s${RESET} %s\n" "help"   "ヘルプメッセージを表示"
+
+  echo
+}
+
+case "$CMD" in
+  local)
+    # shellcheck source=/dev/null
+    source "$COMMAND_ROOT/local.sh" "$@"
+    ;;
+  help)
+    print_usage
+    ;;
+  *)
+    print_usage
+    exit 1
+    ;;
+esac

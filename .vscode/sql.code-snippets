@@ -1,0 +1,24 @@
+{
+  "stored_procedure": {
+    "scope": "sql",
+    "prefix": "stored_procedure",
+    "body": [
+      "DROP TYPE IF EXISTS type_$TM_FILENAME_BASE CASCADE;",
+      "CREATE TYPE type_$TM_FILENAME_BASE AS (",
+      ");",
+      "",
+      "CREATE OR REPLACE FUNCTION $TM_FILENAME_BASE (",
+      "\tp_now TIMESTAMPTZ DEFAULT NULL",
+      "\t,p_operator_id UUID DEFAULT NULL",
+      "\t,p_pg TEXT DEFAULT NULL",
+      ") RETURNS SETOF type_$TM_FILENAME_BASE AS \\$FUNCTION\\$",
+      "DECLARE",
+      "\tw_now TIMESTAMPTZ := COALESCE(p_now, NOW());",
+      "\tw_pg TEXT := COALESCE(p_pg, '$TM_FILENAME_BASE');",
+      "BEGIN",
+      "END;",
+      "\\$FUNCTION\\$ LANGUAGE plpgsql;",
+      ""
+    ]
+  }
+}

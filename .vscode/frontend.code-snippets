@@ -1,0 +1,49 @@
+{
+  "component": {
+    "scope": "vue",
+    "prefix": "component",
+    "body": [
+      "<script lang=\"ts\" setup>",
+      "</script>",
+      "",
+      "<template>",
+      "\t<div class=\"w-full h-full rounded-md border-2 flex flex-col justify-center items-center\">",
+      "\t\t<div>",
+      "\t\t\tTODO",
+      "\t\t</div>",
+      "\t\t<div>",
+      "\t\t\t$TM_FILENAME_BASE",
+      "\t\t</div>",
+      "\t</div>",
+      "</template>",
+      ""
+    ]
+  },
+  "story": {
+    "scope": "stories.ts",
+    "prefix": "story",
+    "body": [
+      "import type { Meta, StoryObj } from \"@storybook/vue3\";",
+      "",
+      "import $TM_FILENAME_BASE from \"./$TM_FILENAME_BASE.vue\";",
+      "",
+      "const meta = {",
+      "\tcomponent: $TM_FILENAME_BASE,",
+      "} satisfies Meta<typeof $TM_FILENAME_BASE>;",
+      "",
+      "type Story = StoryObj<typeof $TM_FILENAME_BASE>;",
+      "",
+      "export const basic: Story = {",
+      "\trender: () => ({",
+      "\t\tcomponents: { $TM_FILENAME_BASE },",
+      "\t\ttemplate: `",
+      "\t\t\t<$TM_FILENAME_BASE",
+      "\t\t\t/>,",
+      "\t}),",
+      "};",
+      "",
+      "export default meta;",
+      ""
+    ]
+  }
+}

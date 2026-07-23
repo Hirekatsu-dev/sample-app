@@ -1,0 +1,16 @@
+EmptyResponse:
+  application/json:
+    schema:
+      type: object
+IdResponse:
+  application/json:
+    schema:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+              example: 'e2cff3f8-b770-40f7-8be8-bb9e72694232'

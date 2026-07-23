@@ -1,0 +1,27 @@
+html,
+body {
+  background-color: #fafaf8;
+  color: #111827;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background-color: rgba(234, 88, 12, 0.18);
+  color: #111827;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/*
+  Tailwind の Preflight によって消されたリンクスタイルをテーマに合わせて復元する
+*/
+a {
+  color: #ea580c;
+}
+
+a:hover {
+  color: #c2410c;
+}

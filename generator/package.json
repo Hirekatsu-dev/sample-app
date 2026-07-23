@@ -1,0 +1,23 @@
+{
+  "license": "UNLICENSED",
+  "scripts": {
+    "generate": "ts-node -r tsconfig-paths/register src/main.ts",
+    "lint": "biome check src",
+    "test": "biome check src",
+    "fix-safe": "biome check --write src",
+    "fix-unsafe": "biome check --write --unsafe src"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.0",
+    "@types/lodash": "^4.14.202",
+    "@types/node": "^20.11.17",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "commander": "^12.0.0",
+    "lodash": "^4.17.21",
+    "ts-dedent": "^2.2.0"
+  }
+}

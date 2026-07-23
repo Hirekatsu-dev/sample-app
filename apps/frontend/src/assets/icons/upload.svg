@@ -1,0 +1,7 @@
+<svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <!-- 箱の形（上部が開いた状態） -->
+  <path d="M3 12V20H21V12" />
+
+  <!-- 上向き矢印 -->
+  <path d="M12 14V6M12 6L8 10M12 6L16 10"/>
+</svg>

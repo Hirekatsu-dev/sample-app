@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "types": ["node"],
+    "paths": {
+      "@seed/domains": ["./src/seed/domains/index.ts"],
+      "@seed/entities": ["./src/seed/entities/index.ts"],
+      "@seed/kbns": ["./src/seed/kbns/index.ts"],
+      "@seed/tables": ["./src/seed/tables/index.ts"],
+      "@seed/tables/system_columns": ["./src/seed/tables/system_columns.ts"],
+      "@seed/errors": ["./src/seed/errors/index.ts"],
+      "@seed/pages": ["./src/seed/pages/index.ts"],
+      "@seed/api_endpoints/types": ["./src/seed/api_endpoints/types.ts"],
+      "@seed/api_schemas/types": ["./src/seed/api_schemas/types.ts"]
+    }
+  }
+}

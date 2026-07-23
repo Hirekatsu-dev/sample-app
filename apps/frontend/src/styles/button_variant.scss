@@ -1,0 +1,46 @@
+@mixin button_variant_solid(
+  $name,
+  $color,
+  $bg_color,
+  $hover_color
+) {
+  .button-variant-#{$name} {
+    color: $color;
+    background-color: $bg_color;
+    border-color: $bg_color;
+
+    &:hover {
+      background-color: $hover_color;
+      border-color: $hover_color;
+    }
+
+    &:disabled {
+      background-color: var(--color-disabled);
+      border-color: var(--color-disabled);
+      color: var(--color-white);
+    }
+  }
+}
+
+@mixin button_variant_outline(
+  $name,
+  $color,
+) {
+  .button-variant-#{$name} {
+    color: $color;
+    border-color: $color;
+    background-color: var(--color-white);
+
+    &:hover {
+      color: var(--color-white);
+      border-color: $color;
+      background-color: $color;
+    }
+
+    &:disabled {
+      background-color: var(--color-white);
+      border-color: var(--color-disabled);
+      color: var(--color-disabled);
+    }
+  }
+}

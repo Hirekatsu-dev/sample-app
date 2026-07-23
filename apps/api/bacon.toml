@@ -1,0 +1,35 @@
+[jobs.default]
+command = ["cargo", "check", "--color", "always"]
+need_stdout = false
+
+
+[jobs.clippy]
+command = ["cargo", "clippy", "--color", "always"]
+need_stdout = false
+
+[jobs.test]
+command = ["cargo", "test", "--color", "always"]
+need_stdout = true
+
+[jobs.run]
+command = ["cargo", "run", "--color", "always"]
+need_stdout = true
+on_change_strategy = "kill_then_restart"
+allow_warnings = true
+
+[jobs.watch]
+command = ["cargo", "run", "--color", "always"]
+need_stdout = true
+on_change_strategy = "kill_then_restart"
+allow_warnings = true
+background = true
+
+[jobs.fmt]
+command = ["cargo", "fmt", "--", "--check"]
+need_stdout = false
+
+[jobs.fmt-run]
+command = ["bash", "-c", "cargo fmt && cargo run"]
+need_stdout = true
+on_change_strategy = "kill_then_restart"
+allow_warnings = true
