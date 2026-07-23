@@ -25,6 +25,8 @@ export const authSchemas = [
   {
     name: 'PostLoginResponseData',
     description: 'ログインレスポンス',
+    // アクセストークンは httpOnly Cookie でのみ返す。
+    // JS から読めるレスポンスボディには含めない。
     properties: [
       {
         name: 'user_id',
@@ -34,13 +36,6 @@ export const authSchemas = [
         description: 'ユーザーID',
         required: true,
         example: '49f3e8b0-9bf6-4269-9d74-6fbd9fcc74a7',
-      },
-      {
-        name: 'access_token',
-        type: 'string',
-        description: 'アクセストークン',
-        required: true,
-        example: 'xxxxx',
       },
     ],
   },

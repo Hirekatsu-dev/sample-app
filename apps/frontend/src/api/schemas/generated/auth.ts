@@ -16,6 +16,4 @@ export interface PostLoginRequestParams {
 export interface PostLoginResponseData {
   /** ユーザーID */
   userId: string;
-  /** アクセストークン */
-  accessToken: string;
 }

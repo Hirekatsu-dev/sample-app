@@ -11,6 +11,8 @@ export const userSessionsTable = defineTable({
     {
       pname: 'user',
       domain: 'ID',
+      // FK 列なので既定のランダム UUID を持たせず、INSERT 時に必ず明示させる。
+      default: '',
       description: 'セッションに紐づくユーザーのID',
     },
 
@@ -44,7 +46,9 @@ export const userSessionsTableForeignKeys = [
     sourceTable: 'user_sessions',
     columns: ['user_id'],
     ...referencesTable('users', ['id'], {
-      onDelete: 'SET NULL',
+      // user_id は NOT NULL なので SET NULL は使えない。
+      // ユーザー削除時はセッションも破棄する。
+      onDelete: 'CASCADE',
       onUpdate: 'RESTRICT',
       relationship: 'one-to-many',
       allowZeroChildren: true,

@@ -47,3 +47,17 @@ post:
               data:
                 type: object
                 nullable: true
+    "500":
+      description: "| エラーコード | 説明 | 追加データ |\n| --- | --- | --- |\n| E0001 | 不明なエラー | - |"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - error_code
+            properties:
+              error_code:
+                type: string
+              data:
+                type: object
+                nullable: true

@@ -20,12 +20,15 @@ CREATE TABLE source.users (
 CREATE TABLE public.users () INHERITS (source.users);
 CREATE TABLE garbage.users () INHERITS (source.users);
 
+ALTER TABLE public.users ADD PRIMARY KEY (id);
+ALTER TABLE garbage.users ADD PRIMARY KEY (id);
+
 CREATE UNIQUE INDEX idx_users_email ON public.users USING BTREE (email);
 
 DROP TABLE IF EXISTS source.user_sessions CASCADE;
 CREATE TABLE source.user_sessions (
   id UUID NOT NULL DEFAULT gen_random_uuid()	 -- ID
-  ,user_id UUID NOT NULL DEFAULT gen_random_uuid()	 -- ID
+  ,user_id UUID NOT NULL	 -- ID
   ,access_token_code TEXT NOT NULL DEFAULT ''	 -- アクセストークン_コード
   ,expire_at TIMESTAMPTZ NOT NULL DEFAULT NOW()	 -- 失効_日時
   ,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()	 -- 日時
@@ -41,7 +44,10 @@ CREATE TABLE source.user_sessions (
 CREATE TABLE public.user_sessions () INHERITS (source.user_sessions);
 CREATE TABLE garbage.user_sessions () INHERITS (source.user_sessions);
 
+ALTER TABLE public.user_sessions ADD PRIMARY KEY (id);
+ALTER TABLE garbage.user_sessions ADD PRIMARY KEY (id);
+
 CREATE UNIQUE INDEX idx_user_sessions_access_token_code ON public.user_sessions USING BTREE (access_token_code);
 
 -- 外部キー制約をまとめて最後に追加
-ALTER TABLE source.user_sessions ADD CONSTRAINT fk_user_sessions_user_id FOREIGN KEY (user_id) REFERENCES source.users (id) ON DELETE SET NULL ON UPDATE RESTRICT;
+ALTER TABLE public.user_sessions ADD CONSTRAINT fk_user_sessions_user_id FOREIGN KEY (user_id) REFERENCES public.users (id) ON DELETE CASCADE ON UPDATE RESTRICT;

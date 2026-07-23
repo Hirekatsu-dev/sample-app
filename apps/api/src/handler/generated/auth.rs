@@ -53,6 +53,13 @@ impl LoginError {
         }
     }
 
+    /// E0001
+    pub fn unknown(log_level: tracing::Level) -> Self {
+        Self {
+            error: ApiError::new(ErrorCode::Unknown, log_level),
+        }
+    }
+
     /// クライアントに返すメッセージを設定する
     pub fn with_message<T: Into<String>>(mut self, message: T) -> Self {
         self.error = self.error.with_message(message);
@@ -92,6 +99,13 @@ impl LogoutError {
     pub fn session_expired(log_level: tracing::Level) -> Self {
         Self {
             error: ApiError::new(ErrorCode::SessionExpired, log_level),
+        }
+    }
+
+    /// E0001
+    pub fn unknown(log_level: tracing::Level) -> Self {
+        Self {
+            error: ApiError::new(ErrorCode::Unknown, log_level),
         }
     }
 

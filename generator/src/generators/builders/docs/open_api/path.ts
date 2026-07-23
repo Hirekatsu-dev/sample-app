@@ -172,7 +172,7 @@ export const buildOpenApiEndpointPathText = (
   const securityContent = (() => {
     if (!endpoint.security) return [];
     if (endpoint.security.includes('OptionalBearerAuth')) {
-      return ['    security:', '      - {}', '      - BearerAuth: []'];
+      return ['    security:', '      - {}', '      - CookieAuth: []'];
     }
     return [
       '    security:',

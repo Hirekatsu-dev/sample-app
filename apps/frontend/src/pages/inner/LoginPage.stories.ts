@@ -29,7 +29,6 @@ export const success: Story = {
       resultCode: '00101',
       data: {
         userId: '49f3e8b0-9bf6-4269-9d74-6fbd9fcc74a7',
-        accessToken: 'dummy-token',
       },
     })),
   },

@@ -1,10 +1,20 @@
 use chrono::{Duration, Utc};
+use sha2::{Digest, Sha256};
 use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::error::{AppError, AppResult};
 use crate::model::auth::AccessToken;
 use crate::model::id::UserId;
+
+/// アクセストークンを SHA-256 でハッシュ化して 16 進文字列にする。
+///
+/// DB には生のトークンではなくこのハッシュを保存する。DB が漏洩しても
+/// 保存値からセッションを再現できないようにするため。
+fn hash_token(token: &str) -> String {
+    let digest = Sha256::digest(token.as_bytes());
+    digest.iter().map(|byte| format!("{byte:02x}")).collect()
+}
 
 /// メールアドレスとパスワードを検証し、一致するユーザーの ID を返す。
 ///
@@ -39,12 +49,15 @@ pub async fn verify_user(pool: &PgPool, email: &str, password: &str) -> AppResul
 }
 
 /// ユーザーに紐づく新しいセッションを作成し、アクセストークンを返す。
+///
+/// 返すのは生のトークンだが、DB にはハッシュを保存する。
 pub async fn create_token(
     pool: &PgPool,
     user_id: UserId,
     ttl_seconds: i64,
 ) -> AppResult<AccessToken> {
     let token = Uuid::new_v4().simple().to_string();
+    let token_hash = hash_token(&token);
     let expire_at = Utc::now() + Duration::seconds(ttl_seconds);
 
     sqlx::query(
@@ -61,7 +74,7 @@ pub async fn create_token(
         "#,
     )
     .bind(user_id)
-    .bind(&token)
+    .bind(&token_hash)
     .bind(expire_at)
     .execute(pool)
     .await
@@ -77,6 +90,8 @@ pub async fn fetch_user_id_from_token(
     pool: &PgPool,
     access_token: &AccessToken,
 ) -> AppResult<Option<UserId>> {
+    let token_hash = hash_token(&access_token.0);
+
     let user_id = sqlx::query_scalar::<_, UserId>(
         r#"
             SELECT user_id
@@ -85,7 +100,7 @@ pub async fn fetch_user_id_from_token(
               AND NOW() < expire_at
         "#,
     )
-    .bind(&access_token.0)
+    .bind(&token_hash)
     .fetch_optional(pool)
     .await
     .map_err(AppError::SpecificOperation)?;
@@ -95,13 +110,15 @@ pub async fn fetch_user_id_from_token(
 
 /// アクセストークンに対応するセッションを削除する。
 pub async fn delete_token(pool: &PgPool, access_token: &AccessToken) -> AppResult<()> {
+    let token_hash = hash_token(&access_token.0);
+
     sqlx::query(
         r#"
             DELETE FROM user_sessions
             WHERE access_token_code = $1
         "#,
     )
-    .bind(&access_token.0)
+    .bind(&token_hash)
     .execute(pool)
     .await
     .map_err(AppError::SpecificOperation)?;

@@ -1,5 +1,10 @@
 name: CI
 on: [push, pull_request]
+
+# GITHUB_TOKEN は既定に依存させず、必要最小限（読み取りのみ）に絞る。
+permissions:
+  contents: read
+
 jobs:
   test-frontend:
     runs-on: ubuntu-latest

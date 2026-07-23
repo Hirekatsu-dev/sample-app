@@ -12,7 +12,7 @@
 | 物理名 | 論理名 | 型 | NOT NULL | デフォルト値 | 説明 |
 |--------|--------|-----|----------|-------------|------|
 | id | ID | UUID | ✓ | gen_random_uuid() |  |
-| user_id | ID | UUID | ✓ | gen_random_uuid() | セッションに紐づくユーザーのID |
+| user_id | ID | UUID | ✓ |  | セッションに紐づくユーザーのID |
 | access_token_code | アクセストークン_コード | TEXT | ✓ | '' | API認証用のトークン |
 | expire_at | 失効_日時 | TIMESTAMPTZ | ✓ | NOW() | セッションの有効期限 |
 | created_at | 日時 | TIMESTAMPTZ | ✓ | NOW() |  |
@@ -37,4 +37,4 @@
 
 | カラム | 参照先テーブル | 参照先カラム | ON DELETE | ON UPDATE |
 |--------|----------------|--------------|-----------|-----------|
-| user_id | [users](./users.md) | id | SET NULL | RESTRICT |
+| user_id | [users](./users.md) | id | CASCADE | RESTRICT |

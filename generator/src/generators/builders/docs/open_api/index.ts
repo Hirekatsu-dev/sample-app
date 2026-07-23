@@ -30,10 +30,11 @@ export const buildOpenApiIndexText = (
     '  schemas:',
     '    $ref: "./schemas/generated_schemas.yaml"',
     '  securitySchemes:',
-    '    BearerAuth:',
-    '      type: http',
-    '      scheme: bearer',
-    '      bearerFormat: JWT',
+    // 認証は httpOnly Cookie のアクセストークンで行う。
+    '    CookieAuth:',
+    '      type: apiKey',
+    '      in: cookie',
+    '      name: access_token',
     '',
   ];
 

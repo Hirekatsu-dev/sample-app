@@ -31,7 +31,4 @@ pub struct PostLoginResponseData {
     /// ユーザーID
     #[garde(skip)]
     pub user_id: id::UserId,
-    /// アクセストークン
-    #[garde(skip)]
-    pub access_token: String,
 }

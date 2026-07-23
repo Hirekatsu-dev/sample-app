@@ -65,8 +65,8 @@ const onSubmit = async () => {
         </KtFormItem>
 
         <KtButton
+          type="submit"
           :disabled="isLoading"
-          @click="onSubmit"
           >ログイン</KtButton
         >
       </form>

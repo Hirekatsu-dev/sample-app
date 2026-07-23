@@ -20,4 +20,7 @@ CREATE TABLE source.users (
 CREATE TABLE public.users () INHERITS (source.users);
 CREATE TABLE garbage.users () INHERITS (source.users);
 
+ALTER TABLE public.users ADD PRIMARY KEY (id);
+ALTER TABLE garbage.users ADD PRIMARY KEY (id);
+
 CREATE UNIQUE INDEX idx_users_email ON public.users USING BTREE (email);

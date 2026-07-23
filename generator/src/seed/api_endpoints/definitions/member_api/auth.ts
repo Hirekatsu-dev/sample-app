@@ -20,7 +20,11 @@ export const authEndpoints: ApiEndpointGroup = {
         type: 'data',
         dataSchema: 'PostLoginResponseData',
       },
-      errorResponses: [{ name: 'パラメータ不正' }, { name: 'ログイン失敗' }],
+      errorResponses: [
+        { name: 'パラメータ不正' },
+        { name: 'ログイン失敗' },
+        { name: '不明なエラー' },
+      ],
       cookieResponse: true,
     },
     {
@@ -31,8 +35,8 @@ export const authEndpoints: ApiEndpointGroup = {
       description: 'ログアウトしてセッションを破棄する',
       tags: ['auth'],
       successResponse: { type: 'empty' },
-      errorResponses: [{ name: 'セッション失効' }],
-      security: ['BearerAuth'],
+      errorResponses: [{ name: 'セッション失効' }, { name: '不明なエラー' }],
+      security: ['CookieAuth'],
       cookieResponse: true,
     },
   ],

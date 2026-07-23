@@ -23,7 +23,7 @@ components:
   schemas:
     $ref: "./schemas/generated_schemas.yaml"
   securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+    CookieAuth:
+      type: apiKey
+      in: cookie
+      name: access_token

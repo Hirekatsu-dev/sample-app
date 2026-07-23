@@ -7,7 +7,7 @@ get:
   description: "アクセストークンに紐づくユーザーの情報を返す"
   tags: ["users"]
   security:
-    - BearerAuth: []
+    - CookieAuth: []
   responses:
     "200":
       description: "成功"

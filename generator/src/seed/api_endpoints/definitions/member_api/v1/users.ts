@@ -17,7 +17,7 @@ export const usersEndpoints: ApiEndpointGroup = {
         dataSchema: 'GetMeResponseData',
       },
       errorResponses: [{ name: 'セッション失効' }],
-      security: ['BearerAuth'],
+      security: ['CookieAuth'],
     },
   ],
 };
