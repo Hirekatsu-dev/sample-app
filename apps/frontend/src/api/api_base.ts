@@ -102,8 +102,12 @@ export class BaseApi {
     switch (resultCode) {
       case ApiErrorCode.InvalidParameter:
         return 'パラメータが不正です。';
+      case ApiErrorCode.LoginFailure:
+        return 'ログインに失敗しました。';
       case ApiErrorCode.NotFound:
         return 'データが見つかりませんでした。';
+      case ApiErrorCode.SessionExpired:
+        return 'セッションが失効しました。再度ログインしてください。';
       default:
         return '不明なエラーが発生しました。';
     }

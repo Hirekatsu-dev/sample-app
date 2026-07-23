@@ -6,6 +6,7 @@
 ## 画面一覧
 
 - [ホーム画面(Home)](./pages/home.md)
+- [ログイン画面(Login)](./pages/login.md)
 
 ## 凡例
 
@@ -18,11 +19,15 @@
 ```mermaid
 flowchart TD
 
+Login["ログイン画面"]
+
 Home["ホーム画面"]
 
     %% 画面遷移
+    Login -->|ログイン成功時| Home
+    Home -->|ログイン| Login
 
     %% スタイル
     classDef public fill:#f0fdf4,stroke:#16a34a,stroke-width:1px
-    class Home public
+    class Login,Home public
 ```

@@ -1,0 +1,31 @@
+# このファイルは generator/src/generators/api_endpoints.ts から生成されます。
+# 直接編集しないでください。
+
+get:
+  operationId: get_me
+  summary: "ログイン中のユーザー情報取得"
+  description: "アクセストークンに紐づくユーザーの情報を返す"
+  tags: ["users"]
+  security:
+    - BearerAuth: []
+  responses:
+    "200":
+      description: "成功"
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../schemas/generated_schemas.yaml#/GetMeResponseData"
+    "401":
+      description: "| エラーコード | 説明 | 追加データ |\n| --- | --- | --- |\n| E0005 | セッション失効 | - |"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - error_code
+            properties:
+              error_code:
+                type: string
+              data:
+                type: object
+                nullable: true

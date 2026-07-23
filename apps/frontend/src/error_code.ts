@@ -4,5 +4,7 @@
 export const ApiErrorCode = {
 		Unknown: 'E0001',	// 不明なエラーが発生しました。
 		InvalidParameter: 'E0002',	// パラメータが不正です。
+		LoginFailure: 'E0003',	// ログインに失敗しました。
 		NotFound: 'E0004',	// データが見つかりませんでした。
+		SessionExpired: 'E0005',	// セッションが失効しました。
 } as const;

@@ -1,7 +1,9 @@
 use serde::Serialize;
 
+pub mod auth;
 pub mod generated;
 pub mod id;
+pub mod user;
 
 /// ID だけを返すレスポンス。
 #[allow(dead_code)]

@@ -1,0 +1,49 @@
+# このファイルは generator/src/generators/api_endpoints.ts から生成されます。
+# 直接編集しないでください。
+
+post:
+  operationId: login
+  summary: "ユーザーログイン"
+  description: "メールアドレスとパスワードでログインする"
+  tags: ["auth"]
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../../../schemas/generated_schemas.yaml#/PostLoginRequestParams"
+  responses:
+    "200":
+      description: "成功"
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/generated_schemas.yaml#/PostLoginResponseData"
+    "400":
+      description: "| エラーコード | 説明 | 追加データ |\n| --- | --- | --- |\n| E0002 | パラメータ不正 | - |"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - error_code
+            properties:
+              error_code:
+                type: string
+              data:
+                type: object
+                nullable: true
+    "401":
+      description: "| エラーコード | 説明 | 追加データ |\n| --- | --- | --- |\n| E0003 | ログイン失敗 | - |"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - error_code
+            properties:
+              error_code:
+                type: string
+              data:
+                type: object
+                nullable: true

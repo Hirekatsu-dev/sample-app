@@ -6,11 +6,13 @@ import { useApi } from '@/composables/use_api';
 import { useGlobalLoading } from '@/composables/use_global_loading';
 import type { HomePageContext } from '../generated/HomePageEntryPoint.vue';
 
-defineProps<{
+const props = defineProps<{
   context: HomePageContext;
 }>();
 
 type HealthStatus = 'unknown' | 'healthy' | 'unhealthy';
+
+const goToLogin = () => props.context.navigations.toLogin();
 
 // ヘルスチェックは generator を通さない custom エンドポイントのため、
 // context 経由ではなく useApi() から直接呼び出す。
@@ -71,5 +73,13 @@ onMounted(checkHealth);
         >
       </template>
     </KtCard>
+
+    <div class="max-w-md mt-6">
+      <KtButton
+        variant="outline"
+        @click="goToLogin"
+        >ログインへ</KtButton
+      >
+    </div>
   </div>
 </template>

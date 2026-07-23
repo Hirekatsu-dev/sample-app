@@ -24,6 +24,12 @@ pub enum AppError {
     #[error("{0}")]
     InvalidUuid(#[from] uuid::Error),
     #[error("{0}")]
+    Bcrypt(#[from] bcrypt::BcryptError),
+    #[error("認証に失敗しました")]
+    Unauthenticated,
+    #[error("認可情報が誤っています")]
+    Unauthorized,
+    #[error("{0}")]
     AlreadyExists(String),
     #[error("内部エラーが発生しました")]
     InternalServerError,
@@ -125,6 +131,8 @@ impl From<AppError> for ApiError {
             AppError::EntityNotFound(_) => ErrorCode::NotFound,
             AppError::ValidationError(_) | AppError::InvalidUuid(_) => ErrorCode::InvalidParameter,
             AppError::AlreadyExists(_) => ErrorCode::InvalidParameter,
+            AppError::Unauthorized => ErrorCode::LoginFailure,
+            AppError::Unauthenticated => ErrorCode::SessionExpired,
             _ => ErrorCode::Unknown,
         };
 

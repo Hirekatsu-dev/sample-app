@@ -13,9 +13,15 @@ pub enum ErrorCode {
     #[strum(serialize = "E0002")]
     #[serde(rename = "E0002")]
     InvalidParameter, // パラメータが不正です。
+    #[strum(serialize = "E0003")]
+    #[serde(rename = "E0003")]
+    LoginFailure, // ログインに失敗しました。
     #[strum(serialize = "E0004")]
     #[serde(rename = "E0004")]
     NotFound, // データが見つかりませんでした。
+    #[strum(serialize = "E0005")]
+    #[serde(rename = "E0005")]
+    SessionExpired, // セッションが失効しました。
 }
 
 impl ErrorCode {
@@ -23,7 +29,9 @@ impl ErrorCode {
         match &self {
             Self::Unknown => StatusCode::INTERNAL_SERVER_ERROR,
             Self::InvalidParameter => StatusCode::BAD_REQUEST,
+            Self::LoginFailure => StatusCode::UNAUTHORIZED,
             Self::NotFound => StatusCode::NOT_FOUND,
+            Self::SessionExpired => StatusCode::UNAUTHORIZED,
         }
     }
 
@@ -32,7 +40,9 @@ impl ErrorCode {
         match &self {
             Self::Unknown => "不明なエラーが発生しました。",
             Self::InvalidParameter => "パラメータが不正です。",
+            Self::LoginFailure => "ログインに失敗しました。",
             Self::NotFound => "データが見つかりませんでした。",
+            Self::SessionExpired => "セッションが失効しました。",
         }
     }
 }
