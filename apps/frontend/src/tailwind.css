@@ -1,64 +1,110 @@
 @import "tailwindcss";
-@import url("https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Public+Sans:wght@400;500;600;700&display=swap");
 
 @plugin "@tailwindcss/typography";
 
+/*
+  デザイントークン: 検査票（Inspection Sheet）
+
+  テストケースを書き、実行し、合否を記録するための道具として設計している。
+  最優先は「判定色が正確に読めること」で、そのために地色をほぼ無彩に保つ。
+  彩度のある地色は合格の緑と不合格の赤を濁らせ、長時間の判定作業で誤読を招くため。
+
+  アクセントは判定色と競合しないインディゴを選んでいる。
+  緑・赤・琥珀を結果の区分に使い切っているので、操作の色はそこから離す必要がある。
+*/
 @theme {
-  /* Paper palette */
-  --color-paper: #fafaf8;
-  --color-paper-alt: #f4f0ea;
-  --color-rule: #e5ddd0;
+  /* Sheet palette: 検査票の紙 */
+  --color-paper: #f7f8f9;
+  --color-paper-alt: #eef0f3;
+  --color-rule: #dfe3e8;
 
   /* Ink palette */
-  --color-ink: #111827;
-  --color-ink-secondary: #4b5563;
-  --color-ink-muted: #9ca3af;
+  --color-ink: #1c2024;
+  --color-ink-secondary: #4a515a;
+  --color-ink-muted: #858d98;
 
-  /* Primary: Deep Ink (header, nav) */
-  --color-primary: #111827;
-  --color-primary-light: #1f2937;
-  --color-secondary: #374151;
+  /* Primary: Slate Black (header, nav) */
+  --color-primary: #1c2024;
+  --color-primary-light: #2c323a;
+  --color-secondary: #4a515a;
 
-  /* Accent: Vermillion Orange (CTAs, highlights) */
-  --color-accent: #ea580c;
-  --color-accent-light: #fdba74;
-  --color-accent-dark: #c2410c;
-  --color-accent-bg: #fff7ed;
+  /* Accent: Indigo (CTAs, highlights) */
+  --color-accent: #3b4ab5;
+  --color-accent-light: #b9c0ea;
+  --color-accent-dark: #2c3890;
+  --color-accent-bg: #eef0fa;
 
   /* Disabled */
-  --color-disabled: #9ca3af;
+  --color-disabled: #a6adb6;
 
-  /* Semantic colors */
-  --color-info: #1d4ed8;
-  --color-info-light: #bfdbfe;
-  --color-info-dark: #1e40af;
+  /*
+    判定色。テスト結果の区分にそのまま対応させる。
+    合格=success / 不合格=error / ブロック=warn / スキップ=ink-muted
+  */
+  --color-info: #3b4ab5;
+  --color-info-light: #c8cdec;
+  --color-info-dark: #2c3890;
 
-  --color-success: #15803d;
-  --color-success-light: #bbf7d0;
-  --color-success-dark: #14532d;
+  --color-success: #12715a;
+  --color-success-light: #b6ddd2;
+  --color-success-dark: #0c4f3e;
 
-  --color-warn: #d97706;
-  --color-warn-light: #fde68a;
-  --color-warn-dark: #92400e;
+  --color-warn: #a8620a;
+  --color-warn-light: #f2d9b4;
+  --color-warn-dark: #7a4607;
 
-  --color-error: #dc2626;
-  --color-error-light: #fecaca;
-  --color-error-dark: #991b1b;
+  --color-error: #c0322b;
+  --color-error-light: #f0c3c0;
+  --color-error-dark: #8a221d;
 
   /* Spacing */
   --spacing-128: 32rem;
   --spacing-256: 64rem;
   --spacing-page: 1200px;
 
-  /* Font families */
-  --font-serif: "Lora", "Georgia", "Times New Roman", serif;
+  /* Font families: 規格文書の硬質なサンセリフと、ID・日時・差分のための等幅 */
+  --font-sans: "Public Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /*
+    角丸と影を締める。記入用紙は浮かないので、面の分離は罫線で行い、
+    影は要素の重なりを示す最小限にとどめる。
+  */
+  --radius-sm: 1px;
+  --radius-md: 2px;
+  --radius-lg: 2px;
+  --radius-xl: 3px;
+  --radius-2xl: 4px;
+
+  --shadow-sm: 0 1px 0 0 rgb(28 32 36 / 0.04);
+  --shadow-md: 0 1px 2px 0 rgb(28 32 36 / 0.06);
+  --shadow-lg: 0 2px 6px 0 rgb(28 32 36 / 0.08);
+  --shadow-xl: 0 4px 12px 0 rgb(28 32 36 / 0.1);
+  --shadow-2xl: 0 8px 24px 0 rgb(28 32 36 / 0.12);
 }
 
-/* Mathematical dot-grid background pattern */
-.bg-math-grid {
-  background-color: var(--color-paper);
-  background-image: radial-gradient(circle, #11182718 1px, transparent 1px);
-  background-size: 24px 24px;
+/*
+  判定印。この画面を象徴する唯一の装飾で、他は罫線と余白だけで構成する。
+
+  合否を塗りつぶしの色面ではなく枠付きの印で示す。一覧に判定が並んだとき、
+  色面だと画面が色で埋まって個々の判定が読み取りにくくなるため、
+  面積を抑えて輪郭と文字で伝える。色は文字色から継承する（例: `stamp text-success`）。
+*/
+.stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border: 1.5px solid currentColor;
+  border-radius: 2px;
+  padding: 0.0625rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.7;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 /* Page fade-in animation */
@@ -88,4 +134,11 @@
 
 .animate-fade-in {
   animation: fade-in 0.35s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up,
+  .animate-fade-in {
+    animation: none;
+  }
 }
