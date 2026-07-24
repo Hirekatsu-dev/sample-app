@@ -36,7 +36,8 @@
 - `repository/test_result.rs` を追加する
 - `service/test_result.rs`
   - 結果は記録のたびに新しい `test_results` を追加する（更新ではなく追記）
-  - 記録と同時に `test_run_cases.latest_result_kbn` と `latest_test_result_id` を更新する
+  - `test_results` の追加と `test_run_cases.latest_result_kbn` / `latest_test_result_id` の更新は同一トランザクションで行う
+  - 並行記録で古い結果が最新値を上書きしないよう、記録の順序はサーバー時刻ではなくDBの単調増加する連番（`test_results` の連番シーケンス）で判定する。`latest_test_result_id` の更新は「新しい結果の連番が現在保持している最新の連番より大きい場合のみ更新する」比較条件付きUPDATEとし、対象の `test_run_cases` 行をロックして整合性を保つ
   - 対象のテスト実行が「実行中」であることを検証する
   - 手順ごとの結果は、対象ケースの手順すべてに対して受け取る
   - 実施者はログイン中のユーザー、実施日時はサーバー側で採番する（クライアント指定は受け付けない）

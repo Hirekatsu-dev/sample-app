@@ -23,7 +23,7 @@
 | --- | --- |
 | entity_ids | `TestSuiteId` |
 | entities | `test_suite`（`id` / `product_version_id` / `parent_test_suite_id`（NULL許可） / `name` / `description` / `display_count`） |
-| tables | `test_suites`（`product_version_id` と `parent_test_suite_id` にインデックス） |
+| tables | `test_suites`（`product_version_id` と `parent_test_suite_id` にインデックス）。同一階層での名前の重複を防ぐため、`(product_version_id, parent_test_suite_id, name)` にDBレベルの一意制約を設ける。`parent_test_suite_id` が NULL のルート直下でも兄弟名が一意になるよう、NULL を素通りさせない方式（`COALESCE(parent_test_suite_id, '00000000-...')` を用いた一意インデックス、または NULL・非NULL 用の2本の部分一意インデックス）で実装する |
 | api_schemas | `TestSuiteNode`（子を持つツリー構造）、`TestSuiteDetail`、`CreateTestSuiteRequest`、`UpdateTestSuiteRequest`、`MoveTestSuiteRequest` |
 | api_endpoints | `GET /v1/product_versions/{version_id}/test_suites`（ツリー取得）、`POST /v1/product_versions/{version_id}/test_suites`、`GET/PUT/DELETE /v1/test_suites/{test_suite_id}`、`PUT /v1/test_suites/{test_suite_id}/parent`（移動） |
 | errors | 配下に要素があるため削除できない、循環する移動先の指定、階層の深さ上限の超過、同一階層での名前の重複 |

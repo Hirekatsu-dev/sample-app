@@ -33,7 +33,7 @@
 
 - `repository/product.rs`, `repository/product_version.rs` を追加する
 - `service/product.rs`
-  - 作成時にワークスペースの `max_product_count` を超えないことを検証する
+  - 作成時、対象ワークスペース行を `SELECT ... FOR UPDATE` でロックしてからプロダクト数を数え、`max_product_count` を超えないことを検証したうえで追加するまでを同一トランザクション内で原子的に行う（並行作成による上限超過を防ぐ）
   - 取得・更新・削除の各操作で、対象が利用中のワークスペースに属することを検証する
   - 削除は論理削除（`public` → `garbage`）とし、配下のバージョンもあわせて移動する
 - `service/product_version.rs`
