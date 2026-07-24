@@ -1,0 +1,121 @@
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap");
+
+@plugin "@tailwindcss/typography";
+
+/*
+  管理画面のデザイントークン。
+
+  メンバー画面（apps/frontend）は「紙とインクと朱色」の温かい系統、
+  管理画面は「青焼き図面（ブループリント）」の冷たい系統として対比させる。
+  テスト仕様を設計図として扱う道具立てであると同時に、
+  どちらの画面を操作しているのかを一目で判別させる役割も持たせている。
+
+  トークンのキーはメンバー画面と揃えている。UIコンポーネントを移植したときに
+  値だけが差し替わり、クラス名は共通で使えるようにするため。
+*/
+@theme {
+  /* Paper palette: 青焼きの紙 */
+  --color-paper: #eef2f8;
+  --color-paper-alt: #e3e9f2;
+  --color-rule: #c3cee0;
+
+  /* Ink palette: 製図インクの濃紺 */
+  --color-ink: #15233c;
+  --color-ink-secondary: #465670;
+  --color-ink-muted: #8593ab;
+
+  /* Primary: Drafting Navy (header, nav) */
+  --color-primary: #15233c;
+  --color-primary-light: #24344f;
+  --color-secondary: #465670;
+
+  /* Accent: Blueprint Blue (CTAs, highlights) */
+  --color-accent: #1a5fd0;
+  --color-accent-light: #9dbdf2;
+  --color-accent-dark: #14418f;
+  --color-accent-bg: #e8effb;
+
+  /* Disabled */
+  --color-disabled: #a3aec0;
+
+  /* Semantic colors */
+  --color-info: #1a5fd0;
+  --color-info-light: #c5d9f8;
+  --color-info-dark: #14418f;
+
+  --color-success: #0f7360;
+  --color-success-light: #b3e0d5;
+  --color-success-dark: #0a4d40;
+
+  --color-warn: #b06a06;
+  --color-warn-light: #f6dda9;
+  --color-warn-dark: #7c4a04;
+
+  --color-error: #b42318;
+  --color-error-light: #f5c4bf;
+  --color-error-dark: #7f1810;
+
+  /* Spacing */
+  --spacing-128: 32rem;
+  --spacing-256: 64rem;
+  --spacing-page: 1280px;
+
+  /* Font families: 技術文書・製図の書体。メンバー画面のセリフ（Lora）と対比させる */
+  --font-sans: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/*
+  方眼紙のパターン。細い方眼と太い方眼を重ねて製図用紙の目盛りを表す。
+  管理画面を象徴する唯一の装飾なので、他の要素は罫線と余白だけで構成する。
+*/
+.bg-blueprint-grid {
+  background-color: var(--color-paper);
+  background-image:
+    linear-gradient(to right, #15233c0a 1px, transparent 1px),
+    linear-gradient(to bottom, #15233c0a 1px, transparent 1px),
+    linear-gradient(to right, #15233c17 1px, transparent 1px),
+    linear-gradient(to bottom, #15233c17 1px, transparent 1px);
+  background-size:
+    16px 16px,
+    16px 16px,
+    96px 96px,
+    96px 96px;
+}
+
+/* Page fade-in animation */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.35s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up,
+  .animate-fade-in {
+    animation: none;
+  }
+}

@@ -55,6 +55,13 @@ export class Endpoint {
     groupName?: string,
     basePath?: string,
     filePath?: string,
+    /** エラー名を解決するための定義。アプリケーションごとに異なるため呼び出し側から渡す。 */
+    errorDefs: readonly {
+      pname: string;
+      lname: string;
+      errorCode: string;
+      httpStatusCode: string;
+    }[] = errors.member,
   ) {
     this.path = endpoint.path;
     this.method = endpoint.method;
@@ -97,7 +104,7 @@ export class Endpoint {
       }>
     >();
     for (const err of endpoint.errorResponses) {
-      const errorDef = errors.member.find((e) => e.lname === err.name);
+      const errorDef = errorDefs.find((e) => e.lname === err.name);
       if (errorDef) {
         const statusCode = HTTP_STATUS_MAP[errorDef.httpStatusCode] ?? '500';
         if (!errorsByStatus.has(statusCode)) {

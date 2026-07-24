@@ -1,0 +1,39 @@
+html,
+body {
+  background-color: #eef2f8;
+  color: #15233c;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background-color: rgba(26, 95, 208, 0.18);
+  color: #15233c;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/*
+  Tailwind の Preflight によって消されたリンクスタイルをテーマに合わせて復元する
+*/
+a {
+  color: #1a5fd0;
+}
+
+a:hover {
+  color: #14418f;
+}
+
+/* キーボード操作時のフォーカスを明示する */
+:focus-visible {
+  outline: 2px solid #1a5fd0;
+  outline-offset: 2px;
+}

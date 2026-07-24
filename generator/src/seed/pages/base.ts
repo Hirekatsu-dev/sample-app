@@ -1,5 +1,5 @@
 import type { KbnId } from '../kbns';
-import type { basePages } from '.';
+import type { baseAdminPages, baseMemberPages } from '.';
 
 /**
  * ページ固有の属性定義（ナビゲーションを含まない）
@@ -127,4 +127,7 @@ type ExtractNames<T extends readonly PageDef[]> =
         : never
       : never);
 
-export type PageName = ExtractNames<typeof basePages>;
+export type MemberPageName = ExtractNames<typeof baseMemberPages>;
+export type AdminPageName = ExtractNames<typeof baseAdminPages>;
+
+export type PageName = MemberPageName | AdminPageName;

@@ -25,7 +25,7 @@
 | tables | `password_resets`（`target_kbn` / `target_id` / `token_code` / `expires_at` / `used_at`）※`token_code` はハッシュ化して保存する |
 | kbns | `password_reset_target`（`admin`: 管理者 / `user`: ユーザー） |
 | api_schemas | `UpdateEmailRequest`, `UpdatePasswordRequest`, `RequestPasswordResetRequest`, `CompletePasswordResetRequest` |
-| api_endpoints | メンバーAPI（メンバーセッション）: `PUT /v1/users/me/email`、`PUT /v1/users/me/password`、`POST /auth/password_reset`、`POST /auth/password_reset/complete`。管理API（管理者セッション）: `PUT /admin/v1/admins/me/email`、`PUT /admin/v1/admins/me/password`、`POST /admin/auth/password_reset`、`POST /admin/auth/password_reset/complete` |
+| api_endpoints | メンバーAPI（`apps/api`）: `PUT /api/v1/users/me/email`、`PUT /api/v1/users/me/password`、`POST /api/auth/password_reset`、`POST /api/auth/password_reset/complete`。管理API（`apps/admin_api`）: `PUT /api/v1/admins/me/email`、`PUT /api/v1/admins/me/password`、`POST /api/auth/password_reset`、`POST /api/auth/password_reset/complete` |
 | errors | 現在のパスワード不一致、メールアドレスの重複、トークンの無効・期限切れ・使用済み |
 | pages | `AccountSetting`、`PasswordResetRequest`、`PasswordResetComplete`、および管理画面版の同等ページ |
 

@@ -1,27 +1,39 @@
 html,
 body {
-  background-color: #fafaf8;
-  color: #111827;
+  background-color: #f7f8f9;
+  color: #1c2024;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 ::selection {
-  background-color: rgba(234, 88, 12, 0.18);
-  color: #111827;
+  background-color: rgba(59, 74, 181, 0.16);
+  color: #1c2024;
 }
 
 html {
   scroll-behavior: smooth;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 /*
   Tailwind の Preflight によって消されたリンクスタイルをテーマに合わせて復元する
 */
 a {
-  color: #ea580c;
+  color: #3b4ab5;
 }
 
 a:hover {
-  color: #c2410c;
+  color: #2c3890;
+}
+
+/* キーボード操作時のフォーカスを明示する */
+:focus-visible {
+  outline: 2px solid #3b4ab5;
+  outline-offset: 2px;
 }

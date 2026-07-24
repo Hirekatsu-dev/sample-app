@@ -26,7 +26,7 @@
 | entities | `workspace`（`id` / `name` / `status_kbn` / `max_user_count` / `max_product_count` / `note_description`） |
 | tables | `workspaces`、`workspace_users`（`workspace_id` × `user_id` にユニークインデックス） |
 | api_schemas | `WorkspaceSummary`, `WorkspaceDetail`, `CreateWorkspaceRequest`, `UpdateWorkspaceRequest`, `WorkspaceUserSummary`, `AddWorkspaceUserRequest` |
-| api_endpoints | `GET/POST /admin/v1/workspaces`、`GET/PUT /admin/v1/workspaces/{workspace_id}`、`PUT /admin/v1/workspaces/{workspace_id}/status`、`GET/POST /admin/v1/workspaces/{workspace_id}/users`、`DELETE /admin/v1/workspaces/{workspace_id}/users/{user_id}` |
+| api_endpoints | 管理API（`apps/admin_api`）に追加する。`GET/POST /api/v1/workspaces`、`GET/PUT /api/v1/workspaces/{workspace_id}`、`PUT /api/v1/workspaces/{workspace_id}/status`、`GET/POST /api/v1/workspaces/{workspace_id}/users`、`DELETE /api/v1/workspaces/{workspace_id}/users/{user_id}` |
 | errors | ワークスペース名の重複、最大ユーザー数の超過、メールアドレスの重複 |
 | pages | `AdminWorkspaceList`、`AdminWorkspaceDetail`、`AdminWorkspaceUserList` |
 

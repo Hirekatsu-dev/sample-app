@@ -24,7 +24,14 @@ Vue 3 + Rust(axum) + PostgreSQL のサンプル Web アプリケーション。
 | コード生成 | TypeScript（`generator/`） |
 | 実行環境 | Docker Compose |
 
-システム構成はフロントエンド、API サーバー（以降単に API と表現します）、DB です。
+システム構成は、メンバー画面と管理画面をアプリケーション単位で分離した以下の 4 アプリと DB です。DB は 1 つを共有します。
+
+| アプリケーション | 役割 | ポート |
+| --- | --- | --- |
+| `apps/frontend` | メンバー画面 | 8080 |
+| `apps/api` | メンバー API | 3000 |
+| `apps/admin_frontend` | 管理画面 | 8081 |
+| `apps/admin_api` | 管理 API | 3001 |
 
 ## 環境構築
 

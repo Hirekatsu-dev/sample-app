@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import KtButton from '@/components/ui/KtButton.vue';
 import KtCard from '@/components/ui/KtCard.vue';
 import { useApi } from '@/composables/use_api';
@@ -21,6 +21,31 @@ const { isLoading, withLoading } = useGlobalLoading();
 
 const status = ref<HealthStatus>('unknown');
 
+// 判定印の表示。テスト結果と同じ語彙で状態を示す。
+const stampLabel = computed(() => {
+  if (isLoading.value) return 'CHECKING';
+  switch (status.value) {
+    case 'healthy':
+      return 'PASS';
+    case 'unhealthy':
+      return 'FAIL';
+    default:
+      return 'NOT RUN';
+  }
+});
+
+const stampColor = computed(() => {
+  if (isLoading.value) return 'text-ink-muted';
+  switch (status.value) {
+    case 'healthy':
+      return 'text-success';
+    case 'unhealthy':
+      return 'text-error';
+    default:
+      return 'text-ink-muted';
+  }
+});
+
 const checkHealth = async () => {
   await withLoading(async () => {
     try {
@@ -36,11 +61,16 @@ onMounted(checkHealth);
 </script>
 
 <template>
-  <div class="max-w-page mx-auto px-4 sm:px-6 py-10">
+  <div class="max-w-page animate-fade-in mx-auto px-4 py-10 sm:px-6">
     <div class="mb-8">
-      <h1 class="text-3xl font-bold mb-2">sample-app</h1>
-      <p class="text-gray-600">
-        コードレビュー支援サービスの試運転用サンプルです。
+      <p
+        class="mb-2 font-mono text-xs font-semibold tracking-[0.18em] text-ink-muted"
+      >
+        TEST MANAGEMENT
+      </p>
+      <h1 class="mb-2 text-3xl font-bold tracking-tight">sample-app</h1>
+      <p class="text-ink-secondary">
+        テストケースを登録し、実行結果を記録します。
       </p>
     </div>
 
@@ -48,22 +78,19 @@ onMounted(checkHealth);
       title="ヘルスチェック"
       class="max-w-md"
     >
-      <p class="text-gray-600">APIとデータベースの疎通状況を表示します。</p>
+      <p class="text-ink-secondary">APIとデータベースの疎通を確認します。</p>
 
-      <p class="mt-2 text-lg font-semibold">
-        <span v-if="isLoading">確認中...</span>
-        <span
-          v-else-if="status === 'healthy'"
-          class="text-success"
-          >正常</span
+      <div class="mt-4 flex items-center gap-3 border-t border-rule pt-4">
+        <span class="font-mono text-xs tracking-wider text-ink-muted"
+          >RESULT</span
         >
         <span
-          v-else-if="status === 'unhealthy'"
-          class="text-error"
-          >異常</span
+          class="stamp"
+          :class="stampColor"
+          aria-live="polite"
+          >{{ stampLabel }}</span
         >
-        <span v-else>未確認</span>
-      </p>
+      </div>
 
       <template #footer>
         <KtButton

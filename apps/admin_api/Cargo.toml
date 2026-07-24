@@ -1,0 +1,47 @@
+[package]
+name = "sample-app-admin-api"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+publish = false
+
+[[bin]]
+name = "app"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1.0.75"
+axum = { version = "0.7.5", features = ["macros"] }
+axum-extra = { version = "0.9.3", features = ["cookie"] }
+bcrypt = "0.15.0"
+chrono = { version = "0.4.26", default-features = false, features = ["serde", "clock"] }
+config = "0.13.3"
+dotenv = "0.15.0"
+garde = { version = "0.18.0", features = ["derive", "email", "url"] }
+serde = { version = "1.0.174", features = ["derive"] }
+serde_json = "1.0.105"
+sha2 = "0.10.8"
+sqlx = { version = "0.7.3", features = [
+    "runtime-tokio",
+    "tls-rustls",
+    "uuid",
+    "chrono",
+    "postgres",
+    "migrate",
+] }
+strum = { version = "0.26.2", features = ["derive"] }
+thiserror = "1.0.44"
+tokio = { version = "1.37.0", features = [
+    "rt",
+    "rt-multi-thread",
+    "time",
+    "macros",
+] }
+tower-http = { version = "0.5.0", features = ["cors", "trace"] }
+tracing = { version = "0.1.37", features = ["log"] }
+tracing-subscriber = { version = "0.3.18", features = ["env-filter", "json"] }
+uuid = { version = "1.4.0", features = ["v4", "serde"] }
+
+[dev-dependencies]
+dotenv = "0.15.0"
+tokio = { version = "1.37.0", features = ["rt", "rt-multi-thread", "macros"] }
