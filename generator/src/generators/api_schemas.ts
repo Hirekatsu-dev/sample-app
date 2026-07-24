@@ -1,5 +1,5 @@
-import type { ApiSchema } from '../seed/api_schemas/types';
 import { apiSchemas } from '../seed/api_schemas';
+import type { ApiSchema } from '../seed/api_schemas/types';
 import { Schema } from './api_schemas/schema';
 import {
   buildRustModText,

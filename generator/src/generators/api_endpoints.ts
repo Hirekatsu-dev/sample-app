@@ -1,7 +1,7 @@
-import type { ApiEndpointGroup } from '../seed/api_endpoints/types';
-import type { ApiSchema } from '../seed/api_schemas/types';
 import { adminApiEndpoints, memberApiEndpoints } from '../seed/api_endpoints';
+import type { ApiEndpointGroup } from '../seed/api_endpoints/types';
 import { apiSchemas } from '../seed/api_schemas';
+import type { ApiSchema } from '../seed/api_schemas/types';
 import { errors } from '../seed/errors';
 import {
   collectEndpointGroups,
@@ -205,10 +205,12 @@ export const generateApiEndpoints = () => {
     }
 
     // OpenAPIパス定義の生成（パスごとに1ファイル）
-    const allEndpointInstances = Object.values(endpointGroups).flatMap((group) =>
-      (group.endpoints ?? []).map(
-        (e) => new Endpoint(e, group.name, group.basePath, undefined, errorDefs),
-      ),
+    const allEndpointInstances = Object.values(endpointGroups).flatMap(
+      (group) =>
+        (group.endpoints ?? []).map(
+          (e) =>
+            new Endpoint(e, group.name, group.basePath, undefined, errorDefs),
+        ),
     );
 
     const endpointsByPath = new Map<string, Endpoint[]>();
