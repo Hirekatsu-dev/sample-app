@@ -4,18 +4,20 @@ import { buildScreenFlowText } from './builders/docs/screen/screen_flow';
 import { buildEntryPointVue } from './builders/frontend/page';
 import { buildRoutesTypeScript } from './builders/frontend/router';
 import { Page } from './pages/page';
+import { appTargets } from './targets';
 import { clear, render } from './util';
 
 /*
 # 画面に関するコードを生成する
+画面はアプリケーション固有のため、ターゲットごとの定義から生成する。
 ## 生成物一覧
-- docs/screens/screen-flow.md
+- {screenDocRoot}/screen-flow.md
   - 画面遷移図（Mermaid形式）
-- docs/screens/pages/{page_name}.md
+- {screenDocRoot}/pages/{page_name}.md
   - 各画面の説明
-- apps/frontend/src/pages/generated/{PageName}PageEntryPoint.vue
+- {frontendRoot}/src/pages/generated/{PageName}PageEntryPoint.vue
   - EntryPointコンポーネント
-- apps/frontend/src/router/generated/routes.ts
+- {frontendRoot}/src/router/generated/routes.ts
   - ルート定義（Routes定数とroutes配列）
 */
 
@@ -23,10 +25,12 @@ import { clear, render } from './util';
  * 出力ディレクトリをクリア
  */
 const reset = () => {
-  clear('docs/screens/screen-flow.md');
-  clear('docs/screens/pages');
-  clear('apps/frontend/src/pages/generated');
-  clear('apps/frontend/src/router/generated');
+  for (const target of appTargets) {
+    clear(`${target.screenDocRoot}/screen-flow.md`);
+    clear(`${target.screenDocRoot}/pages`);
+    clear(`${target.frontendRoot}/src/pages/generated`);
+    clear(`${target.frontendRoot}/src/router/generated`);
+  }
 };
 
 /**
@@ -45,39 +49,41 @@ const flattenPages = (pages: Page[]): Page[] => {
  * 画面関連のコードを生成
  */
 export const generatePages = () => {
-  // トップレベルのページをPageインスタンスに変換（子ページも再帰的に生成される）
-  const topLevelPages = pagesInput.map((p) => new Page(p));
-
-  // すべてのページ（子孫含む）をフラット化
-  const allPages = flattenPages(topLevelPages);
-
   reset();
 
-  // 画面遷移図（トップレベルのページ構造を使用してグルーピング）
-  render(
-    buildScreenFlowText(topLevelPages, allPages),
-    'docs/screens/screen-flow.md',
-  );
+  for (const target of appTargets) {
+    // トップレベルのページをPageインスタンスに変換（子ページも再帰的に生成される）
+    const topLevelPages = pagesInput[target.key].map((p) => new Page(p));
 
-  // 各画面のドキュメント
-  for (const page of allPages) {
+    // すべてのページ（子孫含む）をフラット化
+    const allPages = flattenPages(topLevelPages);
+
+    // 画面遷移図（トップレベルのページ構造を使用してグルーピング）
     render(
-      buildPageDocumentText(page),
-      `docs/screens/pages/${page.snakeName}.md`,
+      buildScreenFlowText(topLevelPages, allPages),
+      `${target.screenDocRoot}/screen-flow.md`,
+    );
+
+    // 各画面のドキュメント
+    for (const page of allPages) {
+      render(
+        buildPageDocumentText(page),
+        `${target.screenDocRoot}/pages/${page.snakeName}.md`,
+      );
+    }
+
+    // EntryPointコンポーネント
+    for (const page of allPages) {
+      render(
+        buildEntryPointVue(page, allPages),
+        `${target.frontendRoot}/src/pages/generated/${page.entryPointName}.vue`,
+      );
+    }
+
+    // ルート定義
+    render(
+      buildRoutesTypeScript(allPages),
+      `${target.frontendRoot}/src/router/generated/routes.ts`,
     );
   }
-
-  // EntryPointコンポーネント
-  for (const page of allPages) {
-    render(
-      buildEntryPointVue(page, allPages),
-      `apps/frontend/src/pages/generated/${page.entryPointName}.vue`,
-    );
-  }
-
-  // ルート定義
-  render(
-    buildRoutesTypeScript(allPages),
-    'apps/frontend/src/router/generated/routes.ts',
-  );
 };

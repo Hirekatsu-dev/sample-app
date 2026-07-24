@@ -1,5 +1,8 @@
-import { memberApiEndpoints } from '../seed/api_endpoints';
+import type { ApiEndpointGroup } from '../seed/api_endpoints/types';
+import type { ApiSchema } from '../seed/api_schemas/types';
+import { adminApiEndpoints, memberApiEndpoints } from '../seed/api_endpoints';
 import { apiSchemas } from '../seed/api_schemas';
+import { errors } from '../seed/errors';
 import {
   collectEndpointGroups,
   Endpoint,
@@ -17,20 +20,27 @@ import {
   type OpenApiQueryParam,
 } from './builders/docs/open_api/path';
 import { buildGeneratedApiText } from './builders/frontend/api_client';
+import { appTargets, type TargetKey } from './targets';
 import { clear, render, renderIfNotExists, toSnakeCase } from './util';
 
 /*
 # APIエンドポイントに関するコードを生成する
+APIエンドポイントはアプリケーション固有のため、ターゲットごとの定義から生成する。
 ## 生成物一覧
-- apps/api/src/route/generated/{group}.rs
+- {backendRoot}/src/route/generated/{group}.rs
   - Rustのルート定義
-- apps/frontend/src/api/generated_api.ts
+- {frontendRoot}/src/api/generated_api.ts
   - TypeScript APIクライアント
-- docs/open_api/api/paths/generated/{group}.yaml
+- {openApiRoot}/paths/generated/{group}.yaml
   - OpenAPIのパス定義
-- docs/open_api/api/index.open_api.yaml
+- {openApiRoot}/index.open_api.yaml
   - OpenAPI統合ファイル
 */
+
+const endpointsByTarget: Record<TargetKey, ApiEndpointGroup> = {
+  member: memberApiEndpoints,
+  admin: adminApiEndpoints,
+};
 
 // フルパス（例: /api/v1/problems/{problemId}/rating）からファイルパスを生成する
 const generateFilePathFromFullPath = (fullPath: string): string => {
@@ -70,12 +80,14 @@ const generateFilePath = (basePath: string, groupName?: string): string => {
 };
 
 const reset = () => {
-  clear('apps/api/src/handler/generated');
-  clear('apps/api/src/handler/generated.rs');
-  clear('apps/api/src/route/generated');
-  clear('apps/api/src/route/generated.rs');
-  clear('apps/frontend/src/api/generated_api.ts');
-  clear('docs/open_api/api/paths/generated');
+  for (const target of appTargets) {
+    clear(`${target.backendRoot}/src/handler/generated`);
+    clear(`${target.backendRoot}/src/handler/generated.rs`);
+    clear(`${target.backendRoot}/src/route/generated`);
+    clear(`${target.backendRoot}/src/route/generated.rs`);
+    clear(`${target.frontendRoot}/src/api/generated_api.ts`);
+    clear(`${target.openApiRoot}/paths/generated`);
+  }
 };
 
 const generateRustHandlerText = (group: EndpointGroup, basePath: string) => {
@@ -96,7 +108,11 @@ const generateRustRouterText = (group: EndpointGroup, basePath: string) => {
   }
 };
 
-const generateHandlerStubs = (group: EndpointGroup, basePath: string) => {
+const generateHandlerStubs = (
+  group: EndpointGroup,
+  basePath: string,
+  backendRoot: string,
+) => {
   const path = basePath.endsWith('/') ? basePath.slice(0, -1) : basePath;
   const hasSubGroups = group.subEndpoints.length > 0;
 
@@ -104,11 +120,11 @@ const generateHandlerStubs = (group: EndpointGroup, basePath: string) => {
     // サブグループがある場合は {name}/mod.rs に統一（Rustのモジュール曖昧性を回避）
     const handlerFilePath = hasSubGroups
       ? path
-        ? `apps/api/src/handler/handlers${path}/${group.name}/mod.rs`
-        : `apps/api/src/handler/handlers/${group.name}/mod.rs`
+        ? `${backendRoot}/src/handler/handlers${path}/${group.name}/mod.rs`
+        : `${backendRoot}/src/handler/handlers/${group.name}/mod.rs`
       : path
-        ? `apps/api/src/handler/handlers${path}/${group.name}.rs`
-        : `apps/api/src/handler/handlers/${group.name}.rs`;
+        ? `${backendRoot}/src/handler/handlers${path}/${group.name}.rs`
+        : `${backendRoot}/src/handler/handlers/${group.name}.rs`;
 
     const subModuleNames = group.subEndpoints.map((sub) => sub.name);
     const stubContent = buildHandlerStubContent(group, subModuleNames);
@@ -116,7 +132,7 @@ const generateHandlerStubs = (group: EndpointGroup, basePath: string) => {
 
     // mod.rsファイルの生成（ディレクトリがある場合のみ）
     if (path) {
-      const modFilePath = `apps/api/src/handler/handlers${path}/mod.rs`;
+      const modFilePath = `${backendRoot}/src/handler/handlers${path}/mod.rs`;
       const modContent = buildModContent(group, path);
       renderIfNotExists(modContent, modFilePath);
     }
@@ -125,88 +141,97 @@ const generateHandlerStubs = (group: EndpointGroup, basePath: string) => {
   // サブグループのスタブも生成
   for (const subGroup of Object.values(group.subEndpoints)) {
     const newPath = path ? `${path}/${group.name}` : `/${group.name}`;
-    generateHandlerStubs(subGroup, newPath);
+    generateHandlerStubs(subGroup, newPath, backendRoot);
   }
 };
 
 export const generateApiEndpoints = () => {
   reset();
 
-  // member_apiのエンドポイントを再帰的に取得
-  const memberEndpointGroups = collectEndpointGroups(memberApiEndpoints);
+  for (const target of appTargets) {
+    const targetEndpoints = endpointsByTarget[target.key];
+    const errorDefs = errors[target.key];
 
-  generateRustHandlerText(
-    new EndpointGroup(memberApiEndpoints),
-    'apps/api/src/handler/',
-  );
-  generateRustRouterText(
-    new EndpointGroup(memberApiEndpoints),
-    'apps/api/src/route/',
-  );
+    // エンドポイントを再帰的に取得
+    const endpointGroups = collectEndpointGroups(targetEndpoints);
 
-  // ハンドラーのスタブファイルを生成
-  // トップレベルの `generated` グループをスキップし、サブグループから開始する
-  // （ディスパッチ層が `crate::handler::handlers::auth::...` 等を呼ぶため）
-  const topGroup = new EndpointGroup(memberApiEndpoints);
-  for (const subGroup of topGroup.subEndpoints) {
-    generateHandlerStubs(subGroup, '');
-  }
-
-  // TypeScript APIクライアントの生成
-  const generatedApiText = buildGeneratedApiText(
-    Object.values(memberEndpointGroups).map((group) => {
-      return new EndpointGroup(group, generateFilePath(group.basePath));
-    }),
-  );
-  render(generatedApiText, 'apps/frontend/src/api/generated_api.ts');
-
-  // クエリパラメータ用のスキーママップを構築
-  const querySchemaMap = new Map<string, readonly OpenApiQueryParam[]>();
-  for (const categorySchemas of Object.values(apiSchemas.member)) {
-    for (const schema of categorySchemas) {
-      querySchemaMap.set(
-        schema.name,
-        schema.properties.map((prop) => ({
-          name: prop.name,
-          type: prop.type,
-          format: 'format' in prop ? (prop.format as string) : undefined,
-          description:
-            'description' in prop ? (prop.description as string) : undefined,
-          required: 'required' in prop ? (prop.required as boolean) : undefined,
-          example: 'example' in prop ? prop.example : undefined,
-        })),
-      );
-    }
-  }
-
-  // OpenAPIパス定義の生成（パスごとに1ファイル）
-  const allEndpointInstances = Object.values(memberEndpointGroups).flatMap(
-    (group) =>
-      (group.endpoints ?? []).map(
-        (e) => new Endpoint(e, group.name, group.basePath),
-      ),
-  );
-
-  const endpointsByPath = new Map<string, Endpoint[]>();
-  for (const endpoint of allEndpointInstances) {
-    const path = endpoint.fullPath;
-    if (!endpointsByPath.has(path)) {
-      endpointsByPath.set(path, []);
-    }
-    endpointsByPath.get(path)?.push(endpoint);
-  }
-
-  const pathInfos: { fullPath: string; pathFilePath: string }[] = [];
-  for (const [fullPath, endpoints] of endpointsByPath.entries()) {
-    const pathFilePath = generateFilePathFromFullPath(fullPath);
-    render(
-      buildOpenApiPathItemText(endpoints, pathFilePath, querySchemaMap),
-      `docs/open_api/api/paths/generated/${pathFilePath}.yaml`,
+    generateRustHandlerText(
+      new EndpointGroup(targetEndpoints),
+      `${target.backendRoot}/src/handler/`,
     );
-    pathInfos.push({ fullPath, pathFilePath });
-  }
+    generateRustRouterText(
+      new EndpointGroup(targetEndpoints),
+      `${target.backendRoot}/src/route/`,
+    );
 
-  // OpenAPI統合ファイルの生成
-  const openApiIndexContent = buildOpenApiIndexText(pathInfos);
-  render(openApiIndexContent, 'docs/open_api/api/index.open_api.yaml');
+    // ハンドラーのスタブファイルを生成
+    // トップレベルの `generated` グループをスキップし、サブグループから開始する
+    // （ディスパッチ層が `crate::handler::handlers::auth::...` 等を呼ぶため）
+    const topGroup = new EndpointGroup(targetEndpoints);
+    for (const subGroup of topGroup.subEndpoints) {
+      generateHandlerStubs(subGroup, '', target.backendRoot);
+    }
+
+    // TypeScript APIクライアントの生成
+    const generatedApiText = buildGeneratedApiText(
+      Object.values(endpointGroups).map((group) => {
+        return new EndpointGroup(group, generateFilePath(group.basePath));
+      }),
+    );
+    render(generatedApiText, `${target.frontendRoot}/src/api/generated_api.ts`);
+
+    // クエリパラメータ用のスキーママップを構築
+    const targetSchemas = apiSchemas[target.key] as Record<
+      string,
+      readonly ApiSchema[]
+    >;
+    const querySchemaMap = new Map<string, readonly OpenApiQueryParam[]>();
+    for (const categorySchemas of Object.values(targetSchemas)) {
+      for (const schema of categorySchemas) {
+        querySchemaMap.set(
+          schema.name,
+          schema.properties.map((prop) => ({
+            name: prop.name,
+            type: prop.type,
+            format: 'format' in prop ? (prop.format as string) : undefined,
+            description:
+              'description' in prop ? (prop.description as string) : undefined,
+            required:
+              'required' in prop ? (prop.required as boolean) : undefined,
+            example: 'example' in prop ? prop.example : undefined,
+          })),
+        );
+      }
+    }
+
+    // OpenAPIパス定義の生成（パスごとに1ファイル）
+    const allEndpointInstances = Object.values(endpointGroups).flatMap((group) =>
+      (group.endpoints ?? []).map(
+        (e) => new Endpoint(e, group.name, group.basePath, undefined, errorDefs),
+      ),
+    );
+
+    const endpointsByPath = new Map<string, Endpoint[]>();
+    for (const endpoint of allEndpointInstances) {
+      const path = endpoint.fullPath;
+      if (!endpointsByPath.has(path)) {
+        endpointsByPath.set(path, []);
+      }
+      endpointsByPath.get(path)?.push(endpoint);
+    }
+
+    const pathInfos: { fullPath: string; pathFilePath: string }[] = [];
+    for (const [fullPath, endpoints] of endpointsByPath.entries()) {
+      const pathFilePath = generateFilePathFromFullPath(fullPath);
+      render(
+        buildOpenApiPathItemText(endpoints, pathFilePath, querySchemaMap),
+        `${target.openApiRoot}/paths/generated/${pathFilePath}.yaml`,
+      );
+      pathInfos.push({ fullPath, pathFilePath });
+    }
+
+    // OpenAPI統合ファイルの生成
+    const openApiIndexContent = buildOpenApiIndexText(pathInfos);
+    render(openApiIndexContent, `${target.openApiRoot}/index.open_api.yaml`);
+  }
 };

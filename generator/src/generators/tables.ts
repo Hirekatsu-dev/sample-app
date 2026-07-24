@@ -8,12 +8,14 @@ import { buildDbSqlForeignKeysText } from './builders/db/foreign_key';
 import { buildERDiagramText } from './builders/docs/erd/er_diagram';
 import { buildTableDocumentText } from './builders/docs/erd/table_details';
 import { Table } from './tables/table';
+import { appTargets } from './targets';
 import { clear, render } from './util';
 
 /*
 # テーブルに関するコードを生成する
+テーブルはDBを共有するため定義は共通とし、テスト用SQLのみ全ターゲットへ配布する。
 ## 生成物一覧
-- apps/api/migrations/test_setup_start.sql
+- {backendRoot}/migrations/test_setup_start.sql
   - テスト時のDB初期化用
 - db/sql/tables/{table_name}.sql
   - ローカルでの開発用
@@ -24,7 +26,9 @@ import { clear, render } from './util';
 */
 
 const reset = () => {
-  clear('apps/api/migrations/test_setup_start.sql');
+  for (const target of appTargets) {
+    clear(`${target.backendRoot}/migrations/test_setup_start.sql`);
+  }
   clear('db/sql/tables');
   clear('db/sql/foreign_keys');
   clear('docs/database/er-diagram.md');
@@ -42,10 +46,12 @@ export const generateTables = () => {
 
   reset();
 
-  render(
-    buildApiMigrationsTestSetupStartText(tables),
-    'apps/api/migrations/test_setup_start.sql',
-  );
+  for (const target of appTargets) {
+    render(
+      buildApiMigrationsTestSetupStartText(tables),
+      `${target.backendRoot}/migrations/test_setup_start.sql`,
+    );
+  }
 
   for (const table of tables) {
     render(buildDbSqlTablesText(table), `db/sql/tables/${table.name}.sql`);
