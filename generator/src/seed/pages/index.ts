@@ -1,9 +1,13 @@
 import type { Page, PageDef, PageName } from './base';
 import { homePage } from './definitions/home';
+import { loginPage } from './definitions/login';
 
 export * from './base';
 
-export const basePages = [homePage] as const satisfies readonly PageDef[];
+export const basePages = [
+  loginPage,
+  homePage,
+] as const satisfies readonly PageDef[];
 
 // 型注釈による検証: navigations[].to が有効な PageName でない場合コンパイルエラーになる。
 // satisfies を直接 basePages に使うと PageName が循環参照になるためここで分離している。

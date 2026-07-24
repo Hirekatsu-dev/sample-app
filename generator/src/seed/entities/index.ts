@@ -1,2 +1,3 @@
-// エンティティ定義は definitions/ 配下に追加し、ここから re-export する。
-export {};
+import { user } from './definitions/user';
+
+export { user };

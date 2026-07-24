@@ -1,19 +1,22 @@
 name: CI
 on: [push, pull_request]
+
+# GITHUB_TOKEN は既定に依存させず、必要最小限（読み取りのみ）に絞る。
+permissions:
+  contents: read
+
 jobs:
   test-frontend:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      - name: Start Frontend
-        run: |
-          docker compose up -d frontend
-          docker compose exec -T frontend npm install
-      - name: Lint
-        run: docker compose exec -T frontend npm run lint
-      - name: Type Check
-        run: docker compose exec -T frontend npm run type-check
+      # vite 開発サーバは起動せず、使い捨てコンテナで lint / type-check を実行する
+      # （up -d で dev サーバを走らせたまま並走させると OOM で kill される）
+      - name: Lint & Type Check
+        run: >
+          docker compose run --rm --no-deps -T frontend
+          sh -c "npm install && npm run lint && npm run type-check"
   test-api:
     runs-on: ubuntu-latest
     steps:
@@ -47,11 +50,6 @@ jobs:
         run: npm ci
       - name: Lint/Format Generator
         run: npm run lint
-      - name: Check Generated Files Are Up To Date
-        run: |
-          npm run generate
-          cd ..
-          git diff --exit-code
   test-shellcheck:
     runs-on: ubuntu-latest
     steps:

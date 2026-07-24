@@ -1,0 +1,22 @@
+# このファイルは generator/src/generators/api_schemas.ts から生成されます。
+# 直接編集しないでください。
+
+GetMeResponseData:
+  type: object
+  description: "ログイン中のユーザー情報"
+  required: ["id", "name", "email"]
+  properties:
+    id:
+      type: string
+      format: uuid
+      description: "ユーザーID"
+      example: "49f3e8b0-9bf6-4269-9d74-6fbd9fcc74a7"
+    name:
+      type: string
+      description: "表示名"
+      example: "サンプル太郎"
+    email:
+      type: string
+      format: email
+      description: "メールアドレス"
+      example: "user@example.com"

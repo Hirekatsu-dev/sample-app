@@ -4,12 +4,14 @@
  */
 import type { RouteRecordRaw } from 'vue-router';
 
+import LoginPageEntryPoint from '@/pages/generated/LoginPageEntryPoint.vue';
 import HomePageEntryPoint from '@/pages/generated/HomePageEntryPoint.vue';
 
 /**
  * ルート名の定数
  */
 export const Routes = Object.freeze({
+  Login: 'Login',
   Home: 'Home',
 });
 
@@ -18,6 +20,11 @@ export const Routes = Object.freeze({
  * カスタムルート（レイアウト、リダイレクトなど）は router/routes.ts で追加してください
  */
 export const generatedRoutes: Array<RouteRecordRaw> = [
+  {
+    path: '/login',
+    name: Routes.Login,
+    component: LoginPageEntryPoint,
+  },
   {
     path: '/',
     name: Routes.Home,

@@ -5,8 +5,10 @@ use crate::state::AppState;
 #[allow(unused_imports)]
 use axum::{routing::*, Router};
 
+pub mod users;
+
 pub fn v1_routes() -> Router<AppState> {
-    let router = Router::new();
+    let router = Router::new().merge(users::users_routes());
 
     Router::new().nest("/v1", router)
 }

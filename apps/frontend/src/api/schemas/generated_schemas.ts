@@ -3,4 +3,5 @@
 
 // re-export all schemas
 
-export {};
+export * from "./generated/auth";
+export * from "./generated/users";

@@ -3,4 +3,6 @@
 //! 各関数は `&PgPool` もしくはトランザクションを引数に取り、SQL の発行だけを行う。
 //! ビジネスロジックは service 層に置く。
 
+pub mod auth;
 pub mod health_check;
+pub mod user;

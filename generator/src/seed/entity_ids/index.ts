@@ -1,3 +1,3 @@
-export const entityIds = [] as const;
+export const entityIds = ['UserId'] as const;
 
 export type EntityId = (typeof entityIds)[number];

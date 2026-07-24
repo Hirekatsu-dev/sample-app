@@ -11,3 +11,5 @@ use std::str::FromStr;
 #[path = "id_macro.rs"]
 #[macro_use]
 mod id_macro;
+
+define_id!(UserId);

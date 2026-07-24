@@ -1,0 +1,41 @@
+# このファイルは generator/src/generators/api_endpoints.ts から生成されます。
+# 直接編集しないでください。
+
+post:
+  operationId: logout
+  summary: "ユーザーログアウト"
+  description: "ログアウトしてセッションを破棄する"
+  tags: ["auth"]
+  security:
+    - CookieAuth: []
+  responses:
+    "200":
+      description: "成功"
+    "401":
+      description: "| エラーコード | 説明 | 追加データ |\n| --- | --- | --- |\n| E0005 | セッション失効 | - |"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - error_code
+            properties:
+              error_code:
+                type: string
+              data:
+                type: object
+                nullable: true
+    "500":
+      description: "| エラーコード | 説明 | 追加データ |\n| --- | --- | --- |\n| E0001 | 不明なエラー | - |"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - error_code
+            properties:
+              error_code:
+                type: string
+              data:
+                type: object
+                nullable: true

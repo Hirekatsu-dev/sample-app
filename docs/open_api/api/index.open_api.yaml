@@ -12,12 +12,18 @@ servers:
     description: 開発環境
 
 paths:
+  /api/auth/login:
+    $ref: "./paths/generated/auth/login.yaml"
+  /api/auth/logout:
+    $ref: "./paths/generated/auth/logout.yaml"
+  /api/v1/users/me:
+    $ref: "./paths/generated/v1/users/me.yaml"
 
 components:
   schemas:
     $ref: "./schemas/generated_schemas.yaml"
   securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+    CookieAuth:
+      type: apiKey
+      in: cookie
+      name: access_token

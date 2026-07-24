@@ -19,8 +19,11 @@ export class Table {
   readonly uniqueKeys: readonly (readonly string[])[];
   readonly indices: Index[];
   readonly foreignKeys: ForeignKey[];
+  // 実際にレコードを保持する public.* テーブルへ制約を張るため、生の定義を保持する。
+  private readonly foreignKeyTemplates: readonly ForeignKeyTemplate[];
 
   constructor(table: TableTemplate, foreignKeys: ForeignKeyTemplate[]) {
+    this.foreignKeyTemplates = foreignKeys ?? [];
     const columns: ColumnTemplate[] = [
       ...table.columns,
       ...systemColumns,
@@ -62,6 +65,14 @@ export class Table {
       '',
       `CREATE TABLE public.${this.name} () INHERITS (source.${this.name});`,
       `CREATE TABLE garbage.${this.name} () INHERITS (source.${this.name});`,
+      // PostgreSQL の継承では PRIMARY KEY / UNIQUE / FOREIGN KEY が子テーブルに
+      // 伝播しないため、実データを持つ public / garbage に明示的に主キーを張る。
+      this.primaryKeys.length === 0 || this.partitionKey
+        ? undefined
+        : `\nALTER TABLE public.${this.name} ADD PRIMARY KEY (${this.primaryKeys.join(', ')});`,
+      this.primaryKeys.length === 0 || this.partitionKey
+        ? undefined
+        : `ALTER TABLE garbage.${this.name} ADD PRIMARY KEY (${this.primaryKeys.join(', ')});`,
       this.indices.length === 0 ? undefined : '',
       this.indices.length === 0
         ? undefined
@@ -72,10 +83,22 @@ export class Table {
   }
 
   get foreignKeyConstraints(): string {
-    if (this.foreignKeys.length === 0) {
+    if (this.foreignKeyTemplates.length === 0) {
       return '';
     }
 
-    return this.foreignKeys.map((fk) => fk.alterTableText).join('\n');
+    // 実データを持つ public.* テーブルに対して外部キーを張る。
+    // （継承では FK が子テーブルへ伝播しないため source.* に張っても効かない）
+    return this.foreignKeyTemplates
+      .map((fk) => {
+        const columns = fk.columns.join(', ');
+        const referencedColumns = fk.referencedColumns.join(', ');
+        const name = fk.name ?? `fk_${fk.sourceTable}_${fk.columns.join('_')}`;
+        const onDelete = fk.onDelete ?? 'RESTRICT';
+        const onUpdate = fk.onUpdate ?? 'RESTRICT';
+
+        return `ALTER TABLE public.${fk.sourceTable} ADD CONSTRAINT ${name} FOREIGN KEY (${columns}) REFERENCES public.${fk.referencedTable} (${referencedColumns}) ON DELETE ${onDelete} ON UPDATE ${onUpdate};`;
+      })
+      .join('\n');
   }
 }
